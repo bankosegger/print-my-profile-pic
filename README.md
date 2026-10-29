@@ -1,33 +1,33 @@
 # print-my-profile-pic
 
-Star this repo to have your GitHub profile picture framed, printed out on my receipt printer, and stuck to my wall. 
+Star this repo to have your GitHub profile picture framed and printed out on my receipt printer.
 
 That's it!
 
-> [!TIP]
-> If you give a one-time [sponsorship](https://github.com/sponsors/aschmelyun?frequency=one-time&sponsor=aschmelyun) of any amount beforehand, your profile picture will be printed in a **special frame**.
-
-<img width="360" height="270" alt="Holding up a photo of me printed on a receipt" src="https://github.com/user-attachments/assets/ecc5eb0a-d4cc-42fc-95f3-c0ea50df649b" />
-
-<img width="360" height="270" alt="Pinning a receipt to a board called the Hall of Frame" src="https://github.com/user-attachments/assets/43bd7bb8-dc86-44bf-9c82-6a4ad7553435" />
-
+<p align="center">
+  <img width="200" alt="A receipt reading &quot;Thanks for the star!&quot; with my profile picture, @bankosegger, starred bankosegger/print-my-profile-pic, star #1" src="images/print_bankosegger_.jpg" />
+</p>
 
 ## How's it work?
 
-GitHub allows you to create webhooks for specific events on your repos, I've set one up for [starring](https://docs.github.com/en/webhooks/webhook-events-and-payloads#star) this project.
+GitHub allows you to create webhooks for specific events on your repos, and I've set one up for [starring](https://docs.github.com/en/webhooks/webhook-events-and-payloads#star) this project.
 
-When that happens, a payload is POSTed to a [Cloudflare tunnel](https://developers.cloudflare.com/tunnel/) domain, which leads to a PHP script running on a Raspberry Pi that's sitting on my desk.
+When that happens, a payload is POSTed to a [Cloudflare Tunnel](https://developers.cloudflare.com/tunnel/) domain, which leads to a small Python (Flask) app running in Docker next to my printer. The app checks the webhook's signature, so only GitHub can make it print.
 
-From the inbound request, you can gleen info about the person who starred the repo, like their display name and avatar URL. The script takes their profile picture, renders it behind a cut-out of a photo frame, and then adds some other info I thought should be included in each receipt.
+From the inbound request, you can glean info about the person who starred the repo, like their username and avatar URL. The app downloads their profile picture, places it behind the cut-out of a random photo frame from [`frames/`](frames), and adds their username, the repo name and the star count. Then it dithers the whole thing to black and white for the thermal head.
 
-The RPi is connected to an Epson TM-T88IV thermal receipt printer via USB, and the PHP script uses my go-to [escpos-php](https://github.com/mike42/escpos-php) library to format the receipt data and send it off to the printer.
+The printer is an SII RP-D10 thermal receipt printer, connected via USB. The app uses [python-escpos](https://github.com/python-escpos/python-escpos) to format the receipt and send it off.
+
+Everyone gets one print: unstarring and starring again won't print a second copy.
 
 ## But why?
 
-It sounded fun when my friend [Sam](https://x.com/samwhoo) mentioned it. That's pretty much it!
+I saw [aschmelyun's original](https://github.com/aschmelyun/print-my-profile-pic) and it looked like fun. That's pretty much it!
 
 ## What now?
 
-I'll periodically update this README with a picture of the pinboard I've dubbed the "Hall of Frame" as pictures get added to it. 
+Want to add a new frame? Send in a PR! Any PNG with a transparent cut-out in the middle works. Name it `frame-<n>.png`.
 
-Want to add a new frame? Send in a PR! 
+## Credits
+
+This is a fork of [aschmelyun/print-my-profile-pic](https://github.com/aschmelyun/print-my-profile-pic). The idea and the original frames are his. His version runs a PHP script on a Raspberry Pi with [escpos-php](https://github.com/mike42/escpos-php) and an Epson TM-T88IV.
